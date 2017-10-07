@@ -3,11 +3,13 @@
 This document is meant to describe a peer-to-peer networking protocol that can
 be reasonably implemented in any popular language. Its principle goals are
 
-1. Must work with nodes which can only initiate connections
-2. Must be capable of network-wide broadcasts
+1. Must work with nodes which can only initiate connections ✓
+    1. Caveat: at least one node must be able to accept connections ✓
+2. Must be capable of network-wide broadcasts ✓
     1. Must scale better than O(N^2)
-3. Must be capable of broadcasting only to direct peers
-4. Must be capable of sending messages to specific nodes
+    2. Lag factor (compared to hub-and-spoke) must be < O(N)
+3. Must be capable of broadcasting only to direct peers ✓
+4. Must be capable of sending messages to specific nodes ✓
     1. And be able to optionally encrypt it (opt-in or opt-out)
 5. Should have public keys as address
 6. Should be able to support a Kademlia-like distributed hash table
@@ -34,6 +36,11 @@ These are the set of constants which manage network topology. They determine
 things like how many peers one can have, or the number of bits in your address
 space. Explanations will be given when these numbers are non-arbitrary.
 
+* `ℓ`: The limit on a nodes self-initiated connections
+* `k`: Kademlia's replication parameter (longest size of k-bucket)
+* `α`: Kademlia's concurrency parameter (number of parallel lookups)
+* `τ`: Kademlia's address size (number of bits to consider per address/hash)
+
 ## Opcodes
 
 These are the values of the various opcodes used in this project. While they are
@@ -54,7 +61,7 @@ arbitrary, they are chosen to take the smallest space possible when serialized.
 
 These are the values of the various connection options used in this project. In
 the lexicon of this paper, "Option" will refer to a key, while "setting" will
-refer to a value. So for the compression option, you can have a setting "zlib".
+refer to a value. So for the compression option, you can have a setting `zlib`.
 While they are arbitrary, they are chosen to take the smallest space possible
 when serialized.
 
@@ -62,9 +69,33 @@ when serialized.
 
 These are the values of the various connection settings used in this project. In
 the lexicon of this paper, "Option" will refer to a key, while "setting" will
-refer to a value. So for the compression option, you can have a setting "zlib".
+refer to a value. So for the compression option, you can have a setting `zlib`.
 While they are arbitrary, they are chosen to take the smallest space possible
 when serialized.
+
+### Compression
+
+Option: 0
+
+Settings:
+
+* `bz2`: 0
+* `gzip`: 1
+* `lzma`: 2
+* `zlib`: 3
+* `snappy`: 4
+
+### Preferred Compression
+
+Option: 1
+
+Settings:
+
+* `bz2`: 0
+* `gzip`: 1
+* `lzma`: 2
+* `zlib`: 3
+* `snappy`: 4
 
 # Message Format
 
