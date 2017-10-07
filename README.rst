@@ -44,10 +44,10 @@ These are the set of constants which manage network topology. They determine
 things like how many peers one can have, or the number of bits in your address
 space. Explanations will be given when these numbers are non-arbitrary.
 
-* `ℓ`: The limit on a nodes self-initiated connections
-* `k`: Kademlia's replication parameter (longest size of k-bucket)
-* `α`: Kademlia's concurrency parameter (number of parallel lookups)
-* `τ`: Kademlia's address size (number of bits to consider per address/hash)
+* ``ℓ``: The limit on a nodes self-initiated connections
+* ``k``: Kademlia's replication parameter (longest size of k-bucket)
+* ``α``: Kademlia's concurrency parameter (number of parallel lookups)
+* ``τ``: Kademlia's address size (number of bits to consider per address/hash)
 
 =======
 Opcodes
@@ -56,16 +56,16 @@ Opcodes
 These are the values of the various opcodes used in this project. While they are
 arbitrary, they are chosen to take the smallest space possible when serialized.
 
-* `ACK`: 0
-* `NACK`: 1
-* `PING`: 2
-* `SET_CONNECTION_OPT`: 3
-* `SHOUT`: 4
-* `SPEAK`: 5
-* `WHISPER`: 6
-* `FIND_NODE`: 7
-* `FIND_VALUE`: 8
-* `STORE`: 9
+* ``ACK``: 0
+* ``NACK``: 1
+* ``PING``: 2
+* ``SET_CONNECTION_OPT``: 3
+* ``SHOUT``: 4
+* ``SPEAK``: 5
+* ``WHISPER``: 6
+* ``FIND_NODE``: 7
+* ``FIND_VALUE``: 8
+* ``STORE``: 9
 
 ==================
 Connection Options
@@ -73,9 +73,9 @@ Connection Options
 
 These are the values of the various connection options used in this project. In
 the lexicon of this paper, "Option" will refer to a key, while "setting" will
-refer to a value. So for the compression option, you can have a setting `zlib`.
-While they are arbitrary, they are chosen to take the smallest space possible
-when serialized.
+refer to a value. So for the compression option, you can have a setting
+``zlib``. While they are arbitrary, they are chosen to take the smallest space
+possible when serialized.
 
 ===================
 Connection Settings
@@ -83,9 +83,9 @@ Connection Settings
 
 These are the values of the various connection settings used in this project. In
 the lexicon of this paper, "Option" will refer to a key, while "setting" will
-refer to a value. So for the compression option, you can have a setting `zlib`.
-While they are arbitrary, they are chosen to take the smallest space possible
-when serialized.
+refer to a value. So for the compression option, you can have a setting
+``zlib``. While they are arbitrary, they are chosen to take the smallest space
+possible when serialized.
 
 ~~~~~~~~~~~
 Compression
@@ -95,11 +95,11 @@ Option: 0
 
 Settings:
 
-* `bz2`: 0
-* `gzip`: 1
-* `lzma`: 2
-* `zlib`: 3
-* `snappy`: 4
+* ``bz2``: 0
+* ``gzip``: 1
+* ``lzma``: 2
+* ``zlib``: 3
+* ``snappy``: 4
 
 ~~~~~~~~~~~~~~~~~~~~~
 Preferred Compression
@@ -109,11 +109,11 @@ Option: 1
 
 Settings:
 
-* `bz2`: 0
-* `gzip`: 1
-* `lzma`: 2
-* `zlib`: 3
-* `snappy`: 4
+* ``bz2``: 0
+* ``gzip``: 1
+* ``lzma``: 2
+* ``zlib``: 3
+* ``snappy``: 4
 
 ##############
 Message Format
@@ -159,8 +159,8 @@ failed, and provide return data if necessary.
 PING
 ====
 
-Always respond with `ACK PING`. This will be utilized heavily in datagram protocols
-like UDP or µTP.
+Always respond with ``ACK PING``. This will be utilized heavily in datagram
+protocols like UDP or µTP.
 
 =====================================
 SET_CONNECTION_OPT <option> <setting>
@@ -170,18 +170,18 @@ This will take two arguments. The first will be the option you wish to set, and
 the second is what you will set it to. Typically this will be something like
 enabling a compression method, or setting one as preferred.
 
-Should either respond `ACK SET_CONNECTION_OPT <option> <setting>` or
-`NACK SET_CONNECTION_OPT <option> <setting>`, depending on if your node supports
-this setting.
+Should either respond ``ACK SET_CONNECTION_OPT <option> <setting>`` or
+``NACK SET_CONNECTION_OPT <option> <setting>``, depending on if your node
+supports this setting.
 
 ===============
 SHOUT <message>
 ===============
 
 This indicates that a message should be forwarded to all peers if you have not
-previously seen it. `ACK`s are ill-advised here.
+previously seen it. ``ACK``s are ill-advised here.
 
-Assuming the above, and that `ℓ` is obeyed, we should be able to make some
+Assuming the above, and that ``ℓ`` is obeyed, we should be able to make some
 reasonable assumptions.
 
 ~~~~~~~~~~~~~~~~~~~
@@ -254,8 +254,8 @@ Therefore:
 Crossover Point
 ~~~~~~~~~~~~~~~
 
-You should be able to show where these two domains meet by finding the point where
-m is equal.
+You should be able to show where these two domains meet by finding the point
+where m is equal.
 
 .. math::
 
@@ -341,9 +341,9 @@ This indicates that a message may be forwarded to all peers *at your
 discretion*, if you have not previously seen it. By default a node should *not*
 forward it, but there are some situations where it might be desirable.
 
-`ACK`s are not necessary except on UDP-like transports, since the nodes
+``ACK``s are not necessary except on UDP-like transports, since the nodes
 receiving this message are directly connected. If it is difficult to implement
-this conditional, send the `ACK` by default.
+this conditional, send the ``ACK`` by default.
 
 =================
 WHISPER <message>
@@ -352,7 +352,8 @@ WHISPER <message>
 This indicates that a message should *not* be forwarded to *anyone*. The message
 may or not be encrypted. That should be handled on the message parser level.
 
-Acknowledge these messages in the format `ACK WHISPER <sig or hash of message>`.
+Acknowledge these messages in the format
+``ACK WHISPER <sig or hash of message>``.
 
 ============================
 FIND_NODE <extended address>
