@@ -328,7 +328,7 @@ This indicates that a message may be forwarded to all peers *at your
 discretion*, if you have not previously seen it. By default a node should *not*
 forward it, but there are some situations where it might be desirable.
 
-``ACK``s are not necessary except on UDP-like transports, since the nodes
+``ACK`` s are not necessary except on UDP-like transports, since the nodes
 receiving this message are directly connected. If it is difficult to implement
 this conditional, send the ``ACK`` by default.
 
