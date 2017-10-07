@@ -206,17 +206,12 @@ sender, who sends it to all. Therefore we can say:
 
 .. math::
 
-   t = (n - 1) \times n
-
+   t = (n - 1) × n
    m = t - n + 1
-
-   = (n - 1)\times n - n + 1
-
+   = (n - 1) × n - n + 1
    = n^2 - 2n + 1
-
    = (n - 1)^2
-
-   = \Theta(n^2)
+   = Θ(n^2)
 
 .. figure:: pics/saturatednetworkgraph.png
     :alt: Data sent to nodes on a network for a single broadcast in saturated networks
@@ -235,15 +230,11 @@ Therefore:
 
 .. math::
 
-   t = 2\verb|ℓ| \times n
-
+   t = 2ℓ × n
    m = t - n + 1
-
-   = 2\verb|ℓ| \times n - n + 1
-
-   = (2\verb|ℓ| - 1)\times n + 1
-
-   = \Theta(n)
+   = 2ℓ × n - n + 1
+   = (2ℓ - 1) × n + 1
+   = Θ(n)
 
 .. figure:: pics/limitednetworkgraph.png
     :alt: Data sent to nodes on a network for a single broadcast in limited networks
@@ -259,15 +250,11 @@ where m is equal.
 
 .. math::
 
-    (n - 1)^2 = (2\verb|ℓ| - 1)\times n + 1
-
-    n^2 - 2n + 1 = (2\verb|ℓ| - 1)\times n + 1
-
-    n^2 - 2n = (2\verb|ℓ| - 1)\times n
-
-    n - 2 = 2\verb|ℓ| - 1
-
-    n = 2\verb|ℓ| + 1
+    (n - 1)^2 = (2ℓ - 1) × n + 1
+    n^2 - 2n + 1 = (2ℓ - 1) × n + 1
+    n^2 - 2n = (2ℓ - 1) × n
+    n - 2 = 2ℓ - 1
+    n = 2ℓ + 1
 
 .. figure:: pics/crossovergraph.png
     :alt: Data sent to nodes on a network for a single broadcast
@@ -294,7 +281,7 @@ library will generate. It looks like:
 The lag it experiences is described by the following formula (assuming similar
 bandwidth and latency):
 
-.. math:: lag\ factor = \lceil max((n-2) \div \verb|ℓ|, 1) \rceil \text { for all networks where } n > 2\verb|ℓ| + 1
+.. math:: lag = ceil(max((n-2) ÷ ℓ, 1)) for all networks where n > 2ℓ + 1
 
 ~~~~~~~~~~
 Conclusion
@@ -322,7 +309,7 @@ The model we'll compare against has the following characteristics:
 
 Such a network should follow the formula:
 
-.. math:: lag\ factor = \lceil (n-1) \div \verb|ℓ| \rceil + 1
+.. math:: lag = ceil((n-1) ÷ ℓ) + 1
 
 This means that, for any network comparison of equal ℓ and n, you have the
 following change in costs:
