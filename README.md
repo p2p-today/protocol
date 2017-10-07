@@ -95,7 +95,7 @@ failed, and provide return data if necessary.
 Always respond with `ACK PING`. This will be utilized heavily in datagram protocols
 like UDP or µTP.
 
-## SET_CONNECTION_OPT <option> <setting>
+## SET_CONNECTION_OPT \<option> \<setting>
 
 This will take two arguments. The first will be the option you wish to set, and
 the second is what you will set it to. Typically this will be something like
@@ -105,12 +105,12 @@ Should either respond `ACK SET_CONNECTION_OPT <option> <setting>` or
 `NACK SET_CONNECTION_OPT <option> <setting>`, depending on if your node supports
 this setting.
 
-## SHOUT <message>
+## SHOUT \<message>
 
 This indicates that a message should be forwarded to all peers if you have not
 previously seen it. `ACK`s are ill-advised here.
 
-## SPEAK <message>
+## SPEAK \<message>
 
 This indicates that a message may be forwarded to all peers *at your
 discretion*, if you have not previously seen it. By default a node should *not*
@@ -120,7 +120,7 @@ forward it, but there are some situations where it might be desirable.
 receiving this message are directly connected. If it is difficult to implement
 this conditional, send the `ACK` by default.
 
-## WHISPER <message>
+## WHISPER \<message>
 
 This indicates that a message should *not* be forwarded to *anyone*. The message
 may or not be encrypted. That should be handled on the message parser level.
