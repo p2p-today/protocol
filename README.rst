@@ -204,7 +204,7 @@ see all other nodes, we can say that it has (n - 1) connections. Each
 node will relay to all but one of its connections, except the original
 sender, who sends it to all. Therefore we can say:
 
-.. math::
+::
 
    t = (n - 1) × n
    m = t - n + 1
@@ -228,7 +228,7 @@ connections on its own. Because connections must have another end, we
 can conclude that the number of inward connections per node is also ℓ.
 Therefore:
 
-.. math::
+::
 
    t = 2ℓ × n
    m = t - n + 1
@@ -248,7 +248,7 @@ Crossover Point
 You should be able to show where these two domains meet by finding the point
 where m is equal.
 
-.. math::
+::
 
     (n - 1)^2 = (2ℓ - 1) × n + 1
     n^2 - 2n + 1 = (2ℓ - 1) × n + 1
@@ -281,7 +281,9 @@ library will generate. It looks like:
 The lag it experiences is described by the following formula (assuming similar
 bandwidth and latency):
 
-.. math:: lag = ceil(max((n-2) ÷ ℓ, 1)) for all networks where n > 2ℓ + 1
+::
+
+    lag = ceil(max((n-2) ÷ ℓ, 1)) for all networks where n > 2ℓ + 1
 
 ~~~~~~~~~~
 Conclusion
@@ -309,7 +311,9 @@ The model we'll compare against has the following characteristics:
 
 Such a network should follow the formula:
 
-.. math:: lag = ceil((n-1) ÷ ℓ) + 1
+::
+
+    lag = ceil((n-1) ÷ ℓ) + 1
 
 This means that, for any network comparison of equal ℓ and n, you have the
 following change in costs:
