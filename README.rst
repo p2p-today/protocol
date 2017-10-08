@@ -1,3 +1,10 @@
+.. contents:: Table of Contents
+    :backlinks: none
+    :depth: 2
+
+.. sectnum::
+
+
 ########
 Abstract
 ########
@@ -45,7 +52,8 @@ things like how many peers one can have, or the number of bits in your address
 space. Explanations will be given when these numbers are non-arbitrary.
 
 * ``ℓ``: The limit on a nodes self-initiated connections
-* ``k``: `Kademlia`_'s replication parameter (longest size of k-bucket)
+* ``k``: `Kademlia`_'s replication parameter (max size of k-bucket, # of
+  ``STORE`` calls)
 * ``α``: `Kademlia`_'s concurrency parameter (number of parallel lookups)
 * ``τ``: `Kademlia`_'s address size (number of bits to consider per address/hash)
 
@@ -67,21 +75,11 @@ arbitrary, they are chosen to take the smallest space possible when serialized.
 * ``FIND_VALUE``: 8
 * ``STORE``: 9
 
-==================
-Connection Options
-==================
+===============================
+Connection Options and Settings
+===============================
 
 These are the values of the various connection options used in this project. In
-the lexicon of this paper, "Option" will refer to a key, while "setting" will
-refer to a value. So for the compression option, you can have a setting
-``zlib``. While they are arbitrary, they are chosen to take the smallest space
-possible when serialized.
-
-===================
-Connection Settings
-===================
-
-These are the values of the various connection settings used in this project. In
 the lexicon of this paper, "Option" will refer to a key, while "setting" will
 refer to a value. So for the compression option, you can have a setting
 ``zlib``. While they are arbitrary, they are chosen to take the smallest space
@@ -214,7 +212,8 @@ sender, who sends it to all. Therefore we can say:
    = Θ(n^2)
 
 .. figure:: pics/saturatednetworkgraph.png
-    :alt: Data sent to nodes on a network for a single broadcast in saturated networks
+    :alt: Data sent to nodes on a network for a single broadcast in saturated
+        networks
 
     Data sent to nodes on a network for a single broadcast in saturated networks
 
@@ -237,7 +236,8 @@ Therefore:
    = Θ(n)
 
 .. figure:: pics/limitednetworkgraph.png
-    :alt: Data sent to nodes on a network for a single broadcast in limited networks
+    :alt: Data sent to nodes on a network for a single broadcast in limited
+        networks
 
     Data sent to nodes on a network for a single broadcast in limited networks
 
@@ -371,4 +371,5 @@ Public API
 ##########
 
 
-.. _Kademlia: https://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf
+.. _Kademlia:
+        https://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf
