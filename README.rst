@@ -340,11 +340,44 @@ this conditional, send the ``ACK`` by default.
 WHISPER <message>
 =================
 
-This indicates that a message should *not* be forwarded to *anyone*. The message
-may or not be encrypted. That should be handled on the message parser level.
+This indicates that a message is intended for a specific destination. The
+message may or not be encrypted. That should be handled on the message parser
+level.
 
 Acknowledge these messages in the format
 ``ACK WHISPER <sig or hash of message>``.
+
+~~~~~~~~~~~~~~~~~~~~~
+If Directly Connected
+~~~~~~~~~~~~~~~~~~~~~
+
+Send the message directly. Encrypt if on an insecure transport. Otherwise
+encryption is optional.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~
+If Not Directly Connected
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Otherwise things can be ambiguous. Both of these methods should be supported,
+but the decision on which to take should be made locally.
+
+---------
+Iterative
+---------
+
+This strategy should be preferred if your k-buckets are not yet filled.
+Essentially you should issue ``FIND_NODE`` RPCs until you've received the info
+for the node you are looking for. When this has happened, send directly. Under
+this scheme, encryption follows the same rules as if you are directly connected,
+because you will be.
+
+---------
+Recursive
+---------
+
+This strategy should be preferred if your k-buckets *are* filled. To do this,
+you issue a ``WHISPER`` RPC to the closest node you have. They will then follow
+this same decision tree. In this scheme encryption is *mandatory*.
 
 ============================
 FIND_NODE <extended address>
