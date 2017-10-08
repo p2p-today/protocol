@@ -320,7 +320,6 @@ following change in costs:
 
 1. Worst case lag is *at worst* the same as it was before (ratio ≤ 1)
 2. *Total* bandwidth used is increased by a factor of 2ℓ - 1 + (1 ÷ n)
-3. *Average* bandwidth used is increased by (2ℓ - 1 + (1 ÷ n)) ÷ n
 
 Therefore, we can conclude that this broadcast design satisfies the requirements
 for an efficient protocol.
