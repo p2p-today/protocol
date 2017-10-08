@@ -51,11 +51,11 @@ These are the set of constants which manage network topology. They determine
 things like how many peers one can have, or the number of bits in your address
 space. Explanations will be given when these numbers are non-arbitrary.
 
-* ``ℓ``: The limit on a nodes self-initiated connections
 * ``k``: `Kademlia`_'s replication parameter (max size of k-bucket, # of
   ``STORE`` calls)
 * ``α``: `Kademlia`_'s concurrency parameter (number of parallel lookups)
 * ``τ``: `Kademlia`_'s address size (number of bits to consider per address/hash)
+* ``ℓ``: The limit on a nodes self-initiated connections (in range [1, ``kτ``])
 
 =======
 Opcodes
