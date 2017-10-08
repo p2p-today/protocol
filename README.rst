@@ -319,7 +319,8 @@ This means that, for any network comparison of equal ℓ and n, you have the
 following change in costs:
 
 1. Worst case lag is *at worst* the same as it was before (ratio ≤ 1)
-2. Total bandwidth used is increased by a factor of 2ℓ - 1 + 1/n
+2. *Total* bandwidth used is increased by a factor of 2ℓ - 1 + (1 ÷ n)
+3. *Average* bandwidth used is increased by (2ℓ - 1 + (1 ÷ n)) ÷ n
 
 Therefore, we can conclude that this broadcast design satisfies the requirements
 for an efficient protocol.
@@ -383,9 +384,12 @@ this same decision tree. In this scheme encryption is *mandatory*.
 FIND_NODE <extended address>
 ============================
 
-=============================
-FIND_VALUE <extended address>
-=============================
+===================================
+FIND_VALUE <extended address> <key>
+===================================
+
+While the address can be computed directly from the key, both are included to
+save computation time.
 
 ~~~~~~~~~~~~~~~~
 If Value Unknown
@@ -395,9 +399,12 @@ If Value Unknown
 If Value Known
 ~~~~~~~~~~~~~~
 
-================================
-STORE <extended address> <value>
-================================
+======================================
+STORE <extended address> <key> <value>
+======================================
+
+While the address can be computed directly from the key, both are included to
+save computation time.
 
 ##########
 Public API
