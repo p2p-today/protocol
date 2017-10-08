@@ -179,7 +179,7 @@ SHOUT <message>
 ===============
 
 This indicates that a message should be forwarded to all peers if you have not
-previously seen it. ``ACK``s are ill-advised here.
+previously seen it. ``ACK`` s are ill-advised here.
 
 Assuming the above, and that ``ℓ`` is obeyed, we should be able to make some
 reasonable assumptions.
