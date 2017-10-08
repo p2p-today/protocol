@@ -14,7 +14,7 @@ be reasonably implemented in any popular language. Its principle goals are
 4. Must be capable of sending messages to specific nodes ✓
     1. And be able to optionally encrypt it (opt-in or opt-out)
 5. Should have public keys as address
-6. Should be able to support a Kademlia-like distributed hash table
+6. Should be able to support a `Kademlia`_-like distributed hash table
     1. This table should be able to have locks
     2. This table should be able to support atomic changes
     3. This table should be able to support diff-based changes
@@ -45,9 +45,9 @@ things like how many peers one can have, or the number of bits in your address
 space. Explanations will be given when these numbers are non-arbitrary.
 
 * ``ℓ``: The limit on a nodes self-initiated connections
-* ``k``: Kademlia's replication parameter (longest size of k-bucket)
-* ``α``: Kademlia's concurrency parameter (number of parallel lookups)
-* ``τ``: Kademlia's address size (number of bits to consider per address/hash)
+* ``k``: `Kademlia`_'s replication parameter (longest size of k-bucket)
+* ``α``: `Kademlia`_'s concurrency parameter (number of parallel lookups)
+* ``τ``: `Kademlia`_'s address size (number of bits to consider per address/hash)
 
 =======
 Opcodes
@@ -369,3 +369,6 @@ STORE <extended address> <value>
 ##########
 Public API
 ##########
+
+
+.. _Kademlia: https://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf
