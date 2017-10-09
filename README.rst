@@ -385,7 +385,7 @@ FIND_NODE <extended address>
 
 This is mostly defined by the `Kademlia`_ spec. Essentially, they send you an
 address, and you reply with the ``k`` closest nodes you're aware of to that
-address, where distance is given by ``XOR(<extended address>, addr) % 2**α``. If
+address, where distance is given by ``XOR(<extended address>, addr) % 2**τ``. If
 you don't know of ``k`` nodes, send back as many as are known. Format like
 ``ACK FIND_NODE <node 0 info> <node 1 info> ...``.
 
