@@ -383,6 +383,11 @@ this same decision tree. In this scheme encryption is *mandatory*.
 FIND_NODE <extended address>
 ============================
 
+This is mostly defined by the `Kademlia`_ spec. Essentially, they send you an
+address, and you reply with the ``k`` closest nodes you're aware of to that
+address. If you don't know of ``k`` nodes, send back as many as are known.
+Format like ``ACK FIND_NODE <node 0 info> <node 1 info> ...``
+
 ===================================
 FIND_VALUE <extended address> <key>
 ===================================
@@ -394,16 +399,21 @@ save computation time.
 If Value Unknown
 ~~~~~~~~~~~~~~~~
 
+Respond as if it was a ``FIND_NODE`` RPC.
+
 ~~~~~~~~~~~~~~
 If Value Known
 ~~~~~~~~~~~~~~
+
+Respond in the format ``ACK FIND_VALUE <key> <value> <metadata>``. Metadata is
+defined in the Object Overview section.
 
 ======================================
 STORE <extended address> <key> <value>
 ======================================
 
 While the address can be computed directly from the key, both are included to
-save computation time.
+save computation time. It should ``ACK`` in a similar format to ``FIND_VALUE``.
 
 ##########
 Public API
