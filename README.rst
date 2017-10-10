@@ -171,11 +171,30 @@ The message header consists of 546 bytes described in the below table
 | 4336-4367 | Length of message payload                           |
 +-----------+-----------------------------------------------------+
 
+Note: Signature schemes have not been explored yet. At some point this table
+will be changed to account for that.
+
+--------------------------
+Isn't that a little large?
+--------------------------
+
+Yes. But there are two reasonable counterpoints against that.
+
+First, you can reduce the overhead from this by batching messages together.
+Since compression happens at the transmission level, more often than not the
+from and to keys will match from message to message. That means you rarely need
+to repeat those fields.
+
+Second, if we need to trade overhead for security, that can be a very worthwhile
+trade. True, it's not necessary for everything, but that doesn't mean there
+should be no balance between the two.
+
 ~~~~~~~~~~~~~~~
 Message Payload
 ~~~~~~~~~~~~~~~
 
-The message payload is an object encoded using the `msgpack`_ standard.
+The message payload is an object encoded using the `msgpack`_ standard. If the
+encryption bit is set, this section will be encrypted using the to public key.
 
 -----------
 Limitations
