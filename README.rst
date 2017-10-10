@@ -55,7 +55,8 @@ space. Explanations will be given when these numbers are non-arbitrary.
   ``STORE`` calls)
 * ``α``: `Kademlia`_'s concurrency parameter (number of parallel lookups)
 * ``τ``: `Kademlia`_'s address size (number of bits to consider per address/hash)
-* ``ℓ``: The limit on a nodes self-initiated connections (in range [1, ``kτ``])
+* ``ℓ``: The limit on a nodes self-initiated connections (in range [1,
+  ``k * (τ - log2(k + 1) + 2)``])
 
 =======
 Opcodes
