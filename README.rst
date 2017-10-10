@@ -253,6 +253,7 @@ Each step will be both explained, and written in a python-like pseudocode.
 
     def parse_tx(transmission):
         """Splits one transmission into its message components"""
+        # note: tx is short for transmission
         tx_header, tx_payload = transmission[:6], transmission[6:]
         tx_opts, tx_len_raw = tx_header[:2], tx_header[2:]
         # Now we parse the length. Luckily the standard library can do that
@@ -271,11 +272,13 @@ Each step will be both explained, and written in a python-like pseudocode.
             msg_len = struct.unpack("!L", msg_header[-4:])[0]  # type: int
             msg_encrypted = msg_header[-5] % 2  # type: int
             msg_op = msg_header[-6] << 4  # type: int
-            msg_payload = tx_payload[parsed : parsed + msg_len]
+            msg_from = msg_header[:270]  # type: bytes
+            msg_to = msg_header[270:540]  # type: bytes
+            msg_payload = tx_payload[parsed : parsed + msg_len]  # type: bytes
             parsed += msg_len
             # In production you would probably use a class, but for brevity's
             # sake, we'll yield a tuple here
-            yield (msg_len, msg_encrypted, msg_payload)
+            yield (msg_from, msg_to, msg_len, msg_encrypted, msg_payload)
 
 After being split in this way, it will get
 
