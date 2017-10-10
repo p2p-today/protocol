@@ -74,6 +74,8 @@ arbitrary, they are chosen to take the smallest space possible when serialized.
 * ``FIND_NODE``: 7
 * ``FIND_VALUE``: 8
 * ``STORE``: 9
+* ``RESERVED``: 10-14
+* ``CUSTOM``: 15
 
 ===============================
 Connection Options and Settings
@@ -542,6 +544,15 @@ STORE <extended address> <key> <value>
 
 While the address can be computed directly from the key, both are included to
 save computation time. It should ``ACK`` in a similar format to ``FIND_VALUE``.
+
+========
+CUSTOM *
+========
+
+This is the opcode reserved for building on top of this protocol. Part of the
+public API is a way to hook into the protocol parser. This opcode indicates that
+a message is meant for this part of the API, rather than a part of the protocol
+defined above.
 
 ##########
 Public API
