@@ -165,9 +165,9 @@ The message header consists of 546 bytes described in the below table
 +-----------+-----------------------------------------------------+
 | 2160-4319 | To public key (DER format - algo identifier)        |
 +-----------+-----------------------------------------------------+
-| 4320-4327 | Operation (as defined in RPCs)                      |
+| 4320-4323 | Operation (as defined in RPCs)                      |
 +-----------+-----------------------------------------------------+
-| 4328-4334 | Reserved                                            |
+| 4324-4334 | Reserved                                            |
 +-----------+-----------------------------------------------------+
 | 4335      | Indicates whether the message is encrypted          |
 +-----------+-----------------------------------------------------+
@@ -246,6 +246,38 @@ Serializing
 =======
 Parsing
 =======
+
+Each step will be both explained, and written in a python-like pseudocode.
+
+.. code-block:: python
+
+    def parse_tx(transmission):
+        """Splits one transmission into its message components"""
+        tx_header, tx_payload = transmission[:6], transmission[6:]
+        tx_opts, tx_len_raw = tx_header[:2], tx_header[2:]
+        # Now we parse the length. Luckily the standard library can do that
+        tx_len = struct.unpack("!L", tx_len_raw)[0]  # type: int
+        tx_compression = tx_opts[1] % 8  # type: int
+
+        # Here we will decompress only the first tx_len bytes
+        tx_payload = decompress(tx_payload[:tx_len], tx_compression)
+        to_parse = len(tx_payload)  # type: int
+        parsed = 0  # type: int
+
+        while parsed < to_parse:
+            msg_header = tx_payload[parsed : parsed + 546]
+            parsed += 546
+            # Now we parse the length. Luckily the standard library can do that
+            msg_len = struct.unpack("!L", msg_header[-4:])[0]  # type: int
+            msg_encrypted = msg_header[-5] % 2  # type: int
+            msg_op = msg_header[-6] << 4  # type: int
+            msg_payload = tx_payload[parsed : parsed + msg_len]
+            parsed += msg_len
+            # In production you would probably use a class, but for brevity's
+            # sake, we'll yield a tuple here
+            yield (msg_len, msg_encrypted, msg_payload)
+
+After being split in this way, it will get
 
 ###############
 Object Overview
