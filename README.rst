@@ -19,9 +19,9 @@ be reasonably implemented in any popular language. Its principle goals are
     2. Lag factor (compared to hub-and-spoke) must be < O(N) ✓
 3. Must be capable of broadcasting only to direct peers ✓
 4. Must be capable of sending messages to specific nodes ✓
-    1. And be able to optionally encrypt it (opt-in or opt-out)
-5. Should have public keys as address
-6. Should be able to support a `Kademlia`_-like distributed hash table
+    1. And be able to optionally encrypt it (opt-in or opt-out) ✓
+5. Should have public keys as address ✓
+6. Should be able to support a `Kademlia`_-like distributed hash table ✓
     1. This table should be able to have locks
     2. This table should be able to support atomic changes
     3. This table should be able to support diff-based changes
@@ -93,11 +93,14 @@ Option: 0
 
 Settings:
 
-* ``bz2``: 0
-* ``gzip``: 1
-* ``lzma``: 2
-* ``zlib``: 3
-* ``snappy``: 4
+* ``none``: 0 (default)
+* ``bz2``: 1
+* ``gzip``: 2
+* ``lzma``: 3
+* ``zlib``: 4
+* ``snappy``: 5
+* reserved: 6
+* reserved: 7
 
 ~~~~~~~~~~~~~~~~~~~~~
 Preferred Compression
@@ -107,15 +110,116 @@ Option: 1
 
 Settings:
 
-* ``bz2``: 0
-* ``gzip``: 1
-* ``lzma``: 2
-* ``zlib``: 3
-* ``snappy``: 4
+* ``none``: 0 (default)
+* ``bz2``: 1
+* ``gzip``: 2
+* ``lzma``: 3
+* ``zlib``: 4
+* ``snappy``: 5
+* reserved: 6
+* reserved: 7
 
 ##############
 Message Format
 ##############
+
+============
+Segmentation
+============
+
+Messages in this protocol can be batched together before sending. Because of
+this, we need to define segments.
+
+~~~~~~~~~~~~~~~~~~~
+Transmission Header
+~~~~~~~~~~~~~~~~~~~
+
+The transmission header consists of 6 bytes. The first 2 bytes contains the
+option section. It consists of a bitmap describing how the transmission is
+packed. This table is shown below. The other 4 bytes contain a big endian,
+unsigned integer which says how long the rest of the transmission will be.
+
++-------+-----------------------------------------------------+
+| Bits  | Meaning                                             |
++=======+=====================================================+
+| 0-12  | Reserved                                            |
++-------+-----------------------------------------------------+
+| 13-15 | Compression method (as defined in network settings) |
++-------+-----------------------------------------------------+
+| 16-47 | Length of remaining transmission                    |
++-------+-----------------------------------------------------+
+
+~~~~~~~~~~~~~~
+Message Header
+~~~~~~~~~~~~~~
+
+The message header consists of 546 bytes described in the below table
+
++-----------+-----------------------------------------------------+
+| Bits      | Meaning                                             |
++===========+=====================================================+
+| 0-2159    | From public key (DER format - algo identifier)      |
++-----------+-----------------------------------------------------+
+| 2160-4319 | To public key (DER format - algo identifier)        |
++-----------+-----------------------------------------------------+
+| 4320-4327 | Operation (as defined in RPCs)                      |
++-----------+-----------------------------------------------------+
+| 4328-4334 | Reserved                                            |
++-----------+-----------------------------------------------------+
+| 4335      | Indicates whether the message is encrypted          |
++-----------+-----------------------------------------------------+
+| 4336-4367 | Length of message payload                           |
++-----------+-----------------------------------------------------+
+
+~~~~~~~~~~~~~~~
+Message Payload
+~~~~~~~~~~~~~~~
+
+The message payload is an object encoded using the `msgpack`_ standard.
+
+-----------
+Limitations
+-----------
+
+In order to preserve the maximum compatibility, we impose additional
+restrictions on the types of objects that may be encoded. You may pack any of
+the following:
+
+1. Nil
+2. Booleans
+3. Doubles (including NaN, Inf, and -Inf)
+4. Integers from -(2\ `63`:superscript:) to (2\ `64`:superscript:)-1
+5. Strings smaller than length (2\ `32`:superscript:)
+6. Buffers smaller than length (2\ `32`:superscript:)
+7. Arrays containing fewer than (2\ `32`:superscript:) items
+8. Maps containing fewer than (2\ `32`:superscript:) associations, with string keys
+
+-------------
+Why not JSON?
+-------------
+
+Partly because of licensing concerns, but mostly because in most languages,
+msgpack is faster. It's also significantly denser. Consider serializing the
+string ``\x00\x00\x01\xff``, something you might do fairly often in this
+library.
+
+JSON: ``" \\ u 0 0 0 0 \\ u 0 0 0 0 \\ u 0 0 0 1 \\ u 0 0 f f "``
+
+`msgpack`_: ``\xc4 \x04 \x00 \x00 \x01 \xff``
+
+That's 26 bytes to msgpack's 6.
+
+~~~~~~~~~~~~~~~~~~~~~
+Transmission Overview
+~~~~~~~~~~~~~~~~~~~~~
+
+Each transmission will start with a Transmission Header, and at least one pair
+of Message Header and Payload. Message Headers and Payloads *always* come in
+associated pairs, and they are *always* directly next to each other.
+
+~~~~~~~
+Parsing
+~~~~~~~
 
 ###############
 Object Overview
@@ -423,3 +527,6 @@ Public API
 
 .. _Kademlia:
         https://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf
+
+.. _msgpack:
+        https://github.com/msgpack/msgpack/blob/master/spec.md
