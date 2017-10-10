@@ -217,9 +217,13 @@ Each transmission will start with a Transmission Header, and at least one pair
 of Message Header and Payload. Message Headers and Payloads *always* come in
 associated pairs, and they are *always* directly next to each other.
 
-~~~~~~~
+===========
+Serializing
+===========
+
+=======
 Parsing
-~~~~~~~
+=======
 
 ###############
 Object Overview
