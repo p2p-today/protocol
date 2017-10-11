@@ -433,12 +433,12 @@ Lag Analysis
 I managed to find the worst possible network topology for lag that this
 library will generate. It looks like:
 
-.. figure:: pics/Worst%20Case%20L1.png
+.. figure:: pics/WorstCaseL1.png
    :alt: Delay in hops for a worst-case network with ℓ=1
 
    Delay in hops for a worst-case network with ℓ=1
 
-.. figure:: pics/Worst%20Case%20L2.png
+.. figure:: pics/WorstCaseL2.png
    :alt: Delay in hops for a worst-case network with ℓ=2
 
    Delay in hops for a worst-case network with ℓ=2
