@@ -54,7 +54,9 @@ space. Explanations will be given when these numbers are non-arbitrary.
 * ``k``: `Kademlia`_'s replication parameter (max size of k-bucket, # of
   ``STORE`` calls)
 * ``α``: `Kademlia`_'s concurrency parameter (number of parallel lookups)
-* ``τ``: `Kademlia`_'s address size (number of bits to consider per address/hash)
+* ``τ``: `Kademlia`_'s address size (number of bits to consider per
+  address/hash)
+* ``β``: The size of an extended address (bit length of encoded public key)
 * ``ℓ``: The limit on a nodes self-initiated connections (in range [1,
   ``k * (τ - log2(k + 1) + 2)``])
 
@@ -176,6 +178,9 @@ The message header consists of 546 bytes described in the below table
 
 Note: Signature schemes have not been explored yet. At some point this table
 will be changed to account for that.
+
+Note: If you change the value of β, this header will also change. The table
+listed above is for β=2160.
 
 --------------------------
 Isn't that a little large?
