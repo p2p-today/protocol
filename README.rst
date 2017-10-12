@@ -65,8 +65,8 @@ space. Explanations will be given when these numbers are non-arbitrary.
 * ``τ``: `Kademlia`_'s address size (number of bits to consider per
   address/hash)
 * ``β``: The size of an extended address (bit length of encoded public key)
-* ``ℓ``: The limit on a nodes self-initiated connections (in range [1,
-  ``k * (τ - log2(k + 1) + 2)``])
+* ``ℓ``: The limit on a nodes self-initiated connections (at most kτ + 2k - 
+  ceil(k×log\ :sub:`2`\ (k+1)))
 
 =======
 Opcodes
