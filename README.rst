@@ -167,7 +167,8 @@ The message header consists of 114 + (β ÷ 4) bytes described in the below tabl
 2β ÷ 8 from the keys themselves.)
 
 The signature is applied to all parts of the message that come after it. In
-other words, it is based on everything from bit 256 onwards.
+other words, it is based on everything from bit 256 onwards, including the
+payload.
 
 +------------------+--------------------------------------------+
 | Bits             | Meaning                                    |
