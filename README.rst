@@ -65,7 +65,7 @@ space. Explanations will be given when these numbers are non-arbitrary.
 * ``τ``: `Kademlia`_'s address size (number of bits to consider per
   address/hash)
 * ``β``: The size of an extended address (bit length of encoded public key)
-* ``ℓ``: The limit on a nodes self-initiated connections (at most kτ + 2k - 
+* ``ℓ``: The limit on a nodes self-initiated connections (at most kτ + 2k -
   ceil(k×log\ :sub:`2`\ (k+1)))
 
 =======
@@ -390,8 +390,7 @@ sender, who sends it to all. Therefore we can say:
    = Θ(n^2)
 
 .. figure:: pics/saturatednetworkgraph.png
-    :alt: Data sent to nodes on a network for a single broadcast in saturated
-        networks
+    :alt: Data sent to nodes on a network for a single broadcast in (saturated)
 
     Data sent to nodes on a network for a single broadcast in saturated networks
 
@@ -414,8 +413,7 @@ Therefore:
    = Θ(n)
 
 .. figure:: pics/limitednetworkgraph.png
-    :alt: Data sent to nodes on a network for a single broadcast in limited
-        networks
+    :alt: Data sent to nodes on a network for a single broadcast in (limited)
 
     Data sent to nodes on a network for a single broadcast in limited networks
 
