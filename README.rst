@@ -12,19 +12,27 @@ Abstract
 This document is meant to describe a peer-to-peer networking protocol that can
 be reasonably implemented in any popular language. Its principle goals are
 
-1. Must work with nodes which can only initiate connections ✓
-    1. Caveat: at least one node must be able to accept connections ✓
-2. Must be capable of network-wide broadcasts ✓
-    1. Must scale better than O(N^2) ✓
-    2. Lag factor (compared to hub-and-spoke) must be < O(N) ✓
-3. Must be capable of broadcasting only to direct peers ✓
-4. Must be capable of sending messages to specific nodes ✓
-    1. And be able to optionally encrypt it (opt-in or opt-out) ✓
-5. Should have public keys as address ✓
-6. Should be able to support a `Kademlia`_-like distributed hash table ✓
+1. Must work with nodes which can only initiate connections (done)
+
+    1. Caveat: at least one node must be able to accept connections (done)
+
+2. Must be capable of network-wide broadcasts (done)
+
+    1. Must scale better than O(N^2) (done)
+    2. Lag factor (compared to hub-and-spoke) must be < O(N) (done)
+
+3. Must be capable of broadcasting only to direct peers (done)
+4. Must be capable of sending messages to specific nodes (done)
+
+    1. And be able to optionally encrypt it (opt-in or opt-out) (done)
+
+5. Should have public keys as address (done)
+6. Should be able to support a `Kademlia`_-like distributed hash table (done)
+
     1. This table should be able to have locks
     2. This table should be able to support atomic changes
     3. This table should be able to support diff-based changes
+
 
 #####
 Notes
