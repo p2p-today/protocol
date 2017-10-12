@@ -33,7 +33,6 @@ be reasonably implemented in any popular language. Its principle goals are
     2. This table should be able to support atomic changes
     3. This table should be able to support diff-based changes
 
-
 #####
 Notes
 #####
@@ -61,10 +60,9 @@ space. Explanations will be given when these numbers are non-arbitrary.
 
 * ``k``: `Kademlia`_'s replication parameter (max size of k-bucket, # of
   ``STORE`` calls)
-* ``α``: `Kademlia`_'s concurrency parameter (number of parallel lookups)
-* ``τ``: `Kademlia`_'s address size (number of bits to consider per
-  address/hash)
-* ``β``: The size of an extended address (bit length of encoded public key)
+* ``α``: Kademlia's concurrency parameter (number of parallel lookups)
+* ``τ``: Kademlia's address size (number of bits to consider per address/hash)
+* ``β``: The size of an extended address (bit length of public key)
 * ``ℓ``: The limit on a nodes self-initiated connections (at most kτ + 2k -
   ceil(k×log\ :sub:`2`\ (k+1)))
 
@@ -164,26 +162,30 @@ unsigned integer which says how long the rest of the transmission will be.
 Message Header
 ~~~~~~~~~~~~~~
 
-The message header consists of 6 + 2β bytes described in the below table
+The message header consists of 114 + (β ÷ 4) bytes described in the below table.
+(38 of this comes from metadata added by our protocol, 76 from DER overhead, and
+2β ÷ 8 from the keys themselves.)
 
-+----------------+------------------------------------------------+
-| Bits           | Meaning                                        |
-+================+================================================+
-| 0-31           | Length of message payload                      |
-+----------------+------------------------------------------------+
-| 32-35          | Operation (as defined in RPCs)                 |
-+----------------+------------------------------------------------+
-| 36-46          | Reserved                                       |
-+----------------+------------------------------------------------+
-| 47             | Indicates whether the message is encrypted     |
-+----------------+------------------------------------------------+
-| 48-(47+β)      | From public key (DER format - algo identifier) |
-+----------------+------------------------------------------------+
-| (48+β)-(47+2β) | To public key (DER format - algo identifier)   |
-+----------------+------------------------------------------------+
+The signature is applied to all parts of the message that come after it. In
+other words, it is based on everything from bit 256 onwards.
 
-Note: Signature schemes have not been explored yet. At some point this table
-will be changed to account for that.
++------------------+--------------------------------------------+
+| Bits             | Meaning                                    |
++==================+============================================+
+| 0-255            | RSA signature (SHA-256, PSS padding)       |
++------------------+--------------------------------------------+
+| 256-287          | Length of message payload                  |
++------------------+--------------------------------------------+
+| 288-291          | Operation (as defined in RPCs)             |
++------------------+--------------------------------------------+
+| 292-302          | Reserved                                   |
++------------------+--------------------------------------------+
+| 303              | Indicates whether the message is encrypted |
++------------------+--------------------------------------------+
+| 304-(607+β)      | From public key (DER format)               |
++------------------+--------------------------------------------+
+| (608+β)-(911+2β) | To public key (DER format)                 |
++------------------+--------------------------------------------+
 
 --------------------------
 Isn't that a little large?
@@ -274,19 +276,20 @@ Each step will be both explained, and written in a python-like pseudocode.
         parsed = 0  # type: int
 
         while parsed < to_parse:
-            msg_header = tx_payload[parsed : parsed + 6 + 2 * β]
-            parsed += 6 + 2 * β
+            msg_header = tx_payload[parsed : parsed + 114 + 2 * β]
+            parsed += 114 + 2 * β
+            msg_sig = msg_header[:32]  # type: bytes
             # Now we parse the length. Luckily the standard library can do that
-            msg_len = struct.unpack("!L", msg_header[:4])[0]  # type: int
-            msg_encrypted = msg_header[5] % 2  # type: int
-            msg_op = msg_header[4] << 4  # type: int
-            msg_from = msg_header[6:6+β/8]  # type: bytes
-            msg_to = msg_header[6+β/8:6+β/4]  # type: bytes
+            msg_len = struct.unpack("!L", msg_header[32:36])[0]  # type: int
+            msg_op = msg_header[36] << 4  # type: int
+            msg_encrypted = msg_header[37] & 1  # type: int
+            msg_from = msg_header[38:76+β/8]  # type: bytes
+            msg_to = msg_header[76+β/8:114+β/4]  # type: bytes
             msg_payload = tx_payload[parsed : parsed + msg_len]  # type: bytes
             parsed += msg_len
             # In production you would probably use a class, but for brevity's
             # sake, we'll yield a tuple here
-            yield (msg_from, msg_to, msg_len, msg_encrypted, msg_payload)
+            yield (msg_sig, msg_from, msg_to, msg_len, msg_encrypted, msg_payload)
 
 After being split in this way, it will get sent on to the protocol parser to
 determine what to do with each message.
@@ -438,7 +441,7 @@ Lag Analysis
 ~~~~~~~~~~~~
 
 I managed to find the worst possible network topology for lag that this
-library will generate. It looks like:
+library will generate. It looks like figures 4 and 5.
 
 .. figure:: pics/WorstCaseL1.png
    :alt: Delay in hops for a worst-case network with ℓ=1
