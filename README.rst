@@ -18,8 +18,8 @@ be reasonably implemented in any popular language. Its principle goals are
 
 2. Must be capable of network-wide broadcasts (done)
 
-    1. Must scale better than O(N^2) (done)
-    2. Lag factor (compared to hub-and-spoke) must be < O(N) (done)
+    1. Must scale better than O(n\ :sup:`2`\ ) (done)
+    2. Lag factor (compared to hub-and-spoke) must be < O(n) (done)
 
 3. Must be capable of broadcasting only to direct peers (done)
 4. Must be capable of sending messages to specific nodes (done)
@@ -112,8 +112,7 @@ Settings:
 * ``lzma``: 3
 * ``zlib``: 4
 * ``snappy``: 5
-* reserved: 6
-* reserved: 7
+* ``reserved``: 6-7
 
 ~~~~~~~~~~~~~~~~~~~~~
 Preferred Compression
@@ -129,8 +128,7 @@ Settings:
 * ``lzma``: 3
 * ``zlib``: 4
 * ``snappy``: 5
-* reserved: 6
-* reserved: 7
+* ``reserved``: 6-7
 
 ##############
 Message Format
@@ -166,29 +164,26 @@ unsigned integer which says how long the rest of the transmission will be.
 Message Header
 ~~~~~~~~~~~~~~
 
-The message header consists of 546 bytes described in the below table
+The message header consists of 6 + 2β bytes described in the below table
 
-+-----------+-----------------------------------------------------+
-| Bits      | Meaning                                             |
-+===========+=====================================================+
-| 0-2159    | From public key (DER format - algo identifier)      |
-+-----------+-----------------------------------------------------+
-| 2160-4319 | To public key (DER format - algo identifier)        |
-+-----------+-----------------------------------------------------+
-| 4320-4323 | Operation (as defined in RPCs)                      |
-+-----------+-----------------------------------------------------+
-| 4324-4334 | Reserved                                            |
-+-----------+-----------------------------------------------------+
-| 4335      | Indicates whether the message is encrypted          |
-+-----------+-----------------------------------------------------+
-| 4336-4367 | Length of message payload                           |
-+-----------+-----------------------------------------------------+
++----------------+------------------------------------------------+
+| Bits           | Meaning                                        |
++================+================================================+
+| 0-31           | Length of message payload                      |
++----------------+------------------------------------------------+
+| 32-35          | Operation (as defined in RPCs)                 |
++----------------+------------------------------------------------+
+| 36-46          | Reserved                                       |
++----------------+------------------------------------------------+
+| 47             | Indicates whether the message is encrypted     |
++----------------+------------------------------------------------+
+| 48-(47+β)      | From public key (DER format - algo identifier) |
++----------------+------------------------------------------------+
+| (48+β)-(47+2β) | To public key (DER format - algo identifier)   |
++----------------+------------------------------------------------+
 
 Note: Signature schemes have not been explored yet. At some point this table
 will be changed to account for that.
-
-Note: If you change the value of β, this header will also change. The table
-listed above is for β=2160.
 
 --------------------------
 Isn't that a little large?
@@ -279,21 +274,22 @@ Each step will be both explained, and written in a python-like pseudocode.
         parsed = 0  # type: int
 
         while parsed < to_parse:
-            msg_header = tx_payload[parsed : parsed + 546]
-            parsed += 546
+            msg_header = tx_payload[parsed : parsed + 6 + 2 * β]
+            parsed += 6 + 2 * β
             # Now we parse the length. Luckily the standard library can do that
-            msg_len = struct.unpack("!L", msg_header[-4:])[0]  # type: int
-            msg_encrypted = msg_header[-5] % 2  # type: int
-            msg_op = msg_header[-6] << 4  # type: int
-            msg_from = msg_header[:270]  # type: bytes
-            msg_to = msg_header[270:540]  # type: bytes
+            msg_len = struct.unpack("!L", msg_header[:4])[0]  # type: int
+            msg_encrypted = msg_header[5] % 2  # type: int
+            msg_op = msg_header[4] << 4  # type: int
+            msg_from = msg_header[6:6+β/8]  # type: bytes
+            msg_to = msg_header[6+β/8:6+β/4]  # type: bytes
             msg_payload = tx_payload[parsed : parsed + msg_len]  # type: bytes
             parsed += msg_len
             # In production you would probably use a class, but for brevity's
             # sake, we'll yield a tuple here
             yield (msg_from, msg_to, msg_len, msg_encrypted, msg_payload)
 
-After being split in this way, it will get
+After being split in this way, it will get sent on to the protocol parser to
+determine what to do with each message.
 
 ###############
 Object Overview
