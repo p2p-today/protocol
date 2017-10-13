@@ -254,6 +254,46 @@ associated pairs, and they are *always* directly next to each other.
 Serializing
 ===========
 
+Each step will be both explained, and written in a python-like pseudocode.
+
+.. code-block:: python
+
+    # Note that while you would ordinarily use classes for this, I will be using
+    # tuples for the sake of brevity
+
+    def make_tx(compression, *messages):  # type: (int, *bytes) -> bytes
+        """Make a transmission from a collection of messages"""
+        payload = b"".join(*messages)  # type: bytes
+        payload = compress(payload, compression)
+        # packs a null byte, an unsigned byte, and a big-endian 32 bit
+        # unsigned int
+        return struct.pack("!xBL", compression % 8, len(payload)) + payload
+
+
+    def make_msg(to,  # type: RSA_Key
+                 op,  # type: int
+                 payload,  # type: Any
+                 priv_key,  # type: RSA_Key
+                 encrypted=False  # type: bool
+        ):  # type: (...) -> Tuple
+        """Constructs a serialized message"""
+        msg_payload = msgpack.packb(payload)  # type: bytes
+        msg_len = len(msg_payload)  # type: int
+        msg_to = to.encode()  # type: bytes
+        msg_from = priv_key.pub_key.encode()  # type: bytes
+        msg_op = op % 16  # type: int
+        if encrypted:
+            msg_payload = to.encrypt(msg_payload)
+        msg_no_sig = b"".join(
+            # packs a big-endian 32 bit unsigned int, then an unsigned byte,
+            # then a bool
+            struct.pack("!LB?", msg_len, msg_op << 4, encrypted),
+            msg_to,
+            msg_from
+        )
+        msg_sig = priv_key.sign(msg_no_sig)
+        return msg_sig + msg_no_sig
+
 =======
 Parsing
 =======
@@ -262,7 +302,7 @@ Each step will be both explained, and written in a python-like pseudocode.
 
 .. code-block:: python
 
-    def parse_tx(transmission):
+    def parse_tx(transmission):  # type: (bytes) -> Iterator(Tuple)
         """Splits one transmission into its message components"""
         # note: tx is short for transmission
         tx_header, tx_payload = transmission[:6], transmission[6:]
@@ -282,7 +322,7 @@ Each step will be both explained, and written in a python-like pseudocode.
             msg_sig = msg_header[:32]  # type: bytes
             # Now we parse the length. Luckily the standard library can do that
             msg_len = struct.unpack("!L", msg_header[32:36])[0]  # type: int
-            msg_op = msg_header[36] << 4  # type: int
+            msg_op = msg_header[36] >> 4  # type: int
             msg_encrypted = msg_header[37] & 1  # type: int
             msg_from = msg_header[38:76+β/8]  # type: bytes
             msg_to = msg_header[76+β/8:114+β/4]  # type: bytes
