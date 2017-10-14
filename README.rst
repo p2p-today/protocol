@@ -224,7 +224,7 @@ the following:
 4. Integers from -(2\ `63`:superscript:) to (2\ `64`:superscript:)-1
 5. Strings smaller than length 2\ `32`:superscript:
 6. Buffers smaller than length 2\ `32`:superscript:
-7. Arrays containing fewer than 2\ `32`:superscript: items
+7. Lists containing fewer than 2\ `32`:superscript: items
 8. Maps containing fewer than 2\ `32`:superscript: associations, with string keys
 
 -------------
