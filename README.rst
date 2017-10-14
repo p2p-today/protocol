@@ -100,6 +100,10 @@ possible when serialized.
 Compression
 ~~~~~~~~~~~
 
+This option is used to set what compression methods are available. The default
+is that none are available. If the method is not supported by the peer,
+they will return a ``NACK``.
+
 Option: 0
 
 Settings:
@@ -116,17 +120,34 @@ Settings:
 Preferred Compression
 ~~~~~~~~~~~~~~~~~~~~~
 
+This option is used if you have a preferred compression method. The default is
+to let your peer decide. If the method is not supported by the peer, they will
+return a ``NACK``.
+
 Option: 1
 
 Settings:
 
-* ``none``: 0 (default)
+* ``none``: 0
 * ``bz2``: 1
 * ``gzip``: 2
 * ``lzma``: 3
 * ``zlib``: 4
 * ``snappy``: 5
 * ``reserved``: 6-7
+
+~~~~~~
+Subnet
+~~~~~~
+
+This option is used to confirm that you belong to the same network. It compares
+your network constants, and a description of the network. If any of these
+differs, it returns a ``NACK``. Upon a ``NACK`` for this, sent or received, you
+should disconnect.
+
+Option: 2
+
+Setting: [k, α, τ, β, ℓ, <network description>]
 
 ##############
 Message Format
@@ -221,11 +242,11 @@ the following:
 1. Nil
 2. Booleans
 3. Doubles (including NaN, Inf, and -Inf)
-4. Integers from -(2\ `63`:superscript:) to (2\ `64`:superscript:)-1
-5. Strings smaller than length 2\ `32`:superscript:
-6. Buffers smaller than length 2\ `32`:superscript:
-7. Lists containing fewer than 2\ `32`:superscript: items
-8. Maps containing fewer than 2\ `32`:superscript: associations, with string keys
+4. Integers from -(2\ `63`:sup:) to (2\ `64`:sup:)-1
+5. Strings smaller than length 2\ `32`:sup:
+6. Buffers smaller than length 2\ `32`:sup:
+7. Lists containing fewer than 2\ `32`:sup: items
+8. Maps containing fewer than 2\ `32`:sup: associations, with string keys
 
 -------------
 Why not JSON?
