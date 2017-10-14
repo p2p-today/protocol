@@ -357,38 +357,44 @@ RPCs
 
 This section describes how your node should respond to incoming network messages
 
-=====
-ACK *
-=====
+=======
+ACK [*]
+=======
 
 This is the RPC that should be sent back to acknowledge a network message as
 successful, and provide return data if necessary.
 
-======
-NACK *
-======
+Note that the arguments are contained in a list.
+
+========
+NACK [*]
+========
 
 This is the RPC that should be sent back to acknowledge a network message as
 failed, and provide return data if necessary.
+
+Note that the arguments are contained in a list.
 
 ====
 PING
 ====
 
-Always respond with ``ACK PING``. This will be utilized heavily in datagram
+Always respond with ``ACK [PING]``. This will be utilized heavily in datagram
 protocols like UDP or µTP.
 
-=====================================
-SET_CONNECTION_OPT <option> <setting>
-=====================================
+========================================
+SET_CONNECTION_OPT [<option>, <setting>]
+========================================
 
 This will take two arguments. The first will be the option you wish to set, and
 the second is what you will set it to. Typically this will be something like
 enabling a compression method, or setting one as preferred.
 
-Should either respond ``ACK SET_CONNECTION_OPT <option> <setting>`` or
-``NACK SET_CONNECTION_OPT <option> <setting>``, depending on if your node
+Should either respond ``ACK [SET_CONNECTION_OPT, <option>, <setting>]`` or
+``NACK [SET_CONNECTION_OPT, <option>, <setting>]``, depending on if your node
 supports this setting.
+
+Note that the arguments are contained in a list.
 
 ===============
 SHOUT <message>
@@ -548,7 +554,7 @@ This indicates that a message may be forwarded to all peers *at your
 discretion*, if you have not previously seen it. By default a node should *not*
 forward it, but there are some situations where it might be desirable.
 
-``ACK`` s are not necessary except on UDP-like transports, since the nodes
+``ACK``\ s are not necessary except on UDP-like transports, since the nodes
 receiving this message are directly connected. If it is difficult to implement
 this conditional, send the ``ACK`` by default.
 
@@ -560,8 +566,7 @@ This indicates that a message is intended for a specific destination. The
 message may or not be encrypted. That should be handled on the message parser
 level.
 
-Acknowledge these messages in the format
-``ACK WHISPER <sig or hash of message>``.
+Acknowledge these messages in the format ``ACK [WHISPER, <message signature>]``.
 
 ~~~~~~~~~~~~~~~~~~~~~
 If Directly Connected
@@ -603,14 +608,16 @@ This is mostly defined by the `Kademlia`_ spec. Essentially, they send you an
 address, and you reply with the ``k`` closest nodes you're aware of to that
 address, where distance is given by ``XOR(<extended address>, addr) % 2**τ``. If
 you don't know of ``k`` nodes, send back as many as are known. Format like
-``ACK FIND_NODE <node 0 info> <node 1 info> ...``.
+``ACK [FIND_NODE, <node 0 info>, <node 1 info>, ...]``.
 
-===================================
-FIND_VALUE <extended address> <key>
-===================================
+=====================================
+FIND_VALUE [<extended address> <key>]
+=====================================
 
 While the address can be computed directly from the key, both are included to
 save computation time.
+
+Note that the arguments are contained in a list.
 
 ~~~~~~~~~~~~~~~~
 If Value Unknown
@@ -622,19 +629,21 @@ Respond as if it was a ``FIND_NODE`` RPC.
 If Value Known
 ~~~~~~~~~~~~~~
 
-Respond in the format ``ACK FIND_VALUE <key> <value> <metadata>``. Metadata is
-defined in the Object Overview section.
+Respond in the format ``ACK [FIND_VALUE, <key>, <value>, <metadata>]``. Metadata
+is defined in the Object Overview section.
 
-======================================
-STORE <extended address> <key> <value>
-======================================
+========================================
+STORE [<extended address> <key> <value>]
+========================================
 
 While the address can be computed directly from the key, both are included to
 save computation time. It should ``ACK`` in a similar format to ``FIND_VALUE``.
 
-========
-CUSTOM *
-========
+Note that the arguments are contained in a list.
+
+================
+CUSTOM <message>
+================
 
 This is the opcode reserved for building on top of this protocol. Part of the
 public API is a way to hook into the protocol parser. This opcode indicates that
