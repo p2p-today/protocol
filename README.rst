@@ -40,11 +40,11 @@ Notes
 While this document will make references to object diagrams, please be aware
 that we are not dictating how you must implement things. If a different
 implementation can achieve the same results, then by all means use it,
-especially if it's simpler.
+especially if it's simpler or more elegant.
 
 Also, this document will largely be written with Python in mind, partly because
 it reads like pseudocode, and partly because I am most comfortable with it. I
-will try to use type annotations as a guide for static languages.
+will use type annotations as a guide for static languages.
 
 #########
 Constants
@@ -63,15 +63,16 @@ space. Explanations will be given when these numbers are non-arbitrary.
 * ``α``: Kademlia's concurrency parameter (number of parallel lookups)
 * ``τ``: Kademlia's address size (number of bits to consider per address/hash)
 * ``β``: The size of an extended address (bit length of public key)
-* ``ℓ``: The limit on a nodes self-initiated connections (at most kτ + 2k -
-  ceil(k×log\ :sub:`2`\ (k+1)))
+* ``ℓ``: The limit on a node's self-initiated connections (at most kτ + 2k -
+   ceil(k×log\ :sub:`2`\ (k+1)))
 
 =======
 Opcodes
 =======
 
-These are the values of the various opcodes used in this project. While they are
-arbitrary, they are chosen to take the smallest space possible when serialized.
+These are the values of the various opcodes used in this project. While their
+values are arbitrary, their ranges are chosen to take the smallest space
+possible when serialized.
 
 * ``ACK``: 0
 * ``NACK``: 1
@@ -93,10 +94,10 @@ Connection Options and Settings
 ===============================
 
 These are the values of the various connection options used in this project. In
-the lexicon of this paper, "Option" will refer to a key, while "setting" will
+the lexicon of this paper, "option" will refer to a key, while "setting" will
 refer to a value. So for the compression option, you can have a setting
-``zlib``. While they are arbitrary, they are chosen to take the smallest space
-possible when serialized.
+``zlib``. While their values are arbitrary, their ranges are chosen to take the
+smallest space possible when serialized.
 
 ~~~~~~~~~~~
 Compression
@@ -143,9 +144,9 @@ Subnet
 ~~~~~~
 
 This option is used to confirm that you belong to the same network. It compares
-your network constants, and a description of the network. If any of these
-differs, it returns a ``NACK``. Upon a ``NACK`` for this, sent or received, you
-should disconnect.
+your network constants and a description of the network. If any of these differs
+it returns a ``NACK``. Upon a ``NACK`` for this, sent or received, you should
+disconnect.
 
 Option: 2
 
@@ -159,8 +160,8 @@ Message Format
 Segmentation
 ============
 
-Messages in this protocol can be batched together before sending. Because of
-this, we need to define segments.
+Messages in this protocol can—and should—be batched together before sending.
+Because of this, we need to define segments.
 
 ~~~~~~~~~~~~~~~~~~~
 Transmission Header
@@ -215,14 +216,19 @@ payload.
 Isn't that a little large?
 --------------------------
 
-Yes. But there are two reasonable counterpoints against that.
+Yes. But there are some reasonable counterpoints against that.
 
 First, you can reduce the overhead from this by batching messages together.
 Since compression happens at the transmission level, more often than not the
 from and to keys will match from message to message. That means you rarely need
 to repeat those fields.
 
-Second, if we need to trade overhead for security, that can be a very worthwhile
+Second, this format allows you to verify it was sent by the public key given. It
+means that if you implement a system where certain stored values are "owned" by
+a given node, it's much easier to verify if the node requesting the change is
+allowed to.
+
+Third, if we need to trade overhead for security, that can be a very worthwhile
 trade. True, it's not necessary for everything, but that doesn't mean there
 should be no balance between the two.
 
@@ -249,6 +255,11 @@ the following:
 6. Buffers smaller than length 2\ `32`:sup:
 7. Lists containing fewer than 2\ `32`:sup: items
 8. Maps containing fewer than 2\ `32`:sup: associations, with string keys
+
+This may be extended if the various msgpack libraries support serializing
+addiitonal types. At the time of writing this, timestamps have just entered
+the msgpack specification. They are largely unimplemented in the various msgpack
+libraries.
 
 -------------
 Why not JSON?
@@ -291,7 +302,7 @@ Each step will be both explained, and written in a python-like pseudocode.
 
     def make_tx(compression, *messages):  # type: (int, *bytes) -> bytes
         """Make a transmission from a collection of messages"""
-        payload = b"".join(*messages)  # type: bytes
+        payload = b"".join(messages)  # type: bytes
         payload = compress(payload, compression)
         # packs a null byte, an unsigned byte, and a big-endian 32 bit
         # unsigned int
@@ -300,18 +311,18 @@ Each step will be both explained, and written in a python-like pseudocode.
 
     def make_msg(to,  # type: RSA_Key
                  op,  # type: int
-                 payload,  # type: Any
+                 payload,  # type: MsgPackable
                  priv_key,  # type: RSA_Key
                  encrypted=False  # type: bool
-        ):  # type: (...) -> Tuple
+        ):  # type: (...) -> bytes
         """Constructs a serialized message"""
         msg_payload = msgpack.packb(payload)  # type: bytes
-        msg_len = len(msg_payload)  # type: int
         msg_to = to.encode()  # type: bytes
         msg_from = priv_key.pub_key.encode()  # type: bytes
         msg_op = op % 16  # type: int
         if encrypted:
             msg_payload = to.encrypt(msg_payload)
+        msg_len = len(msg_payload)  # type: int
         msg_no_sig = b"".join(
             # packs a big-endian 32 bit unsigned int, then an unsigned byte,
             # then a bool
@@ -322,9 +333,9 @@ Each step will be both explained, and written in a python-like pseudocode.
         msg_sig = priv_key.sign(msg_no_sig)
         return msg_sig + msg_no_sig
 
-=======
-Parsing
-=======
+=============
+Deserializing
+=============
 
 Each step will be both explained, and written in a python-like pseudocode.
 
@@ -333,10 +344,10 @@ Each step will be both explained, and written in a python-like pseudocode.
     def parse_tx(transmission):  # type: (bytes) -> Iterator(Tuple)
         """Splits one transmission into its message components"""
         # note: tx is short for transmission
-        tx_header, tx_payload = transmission[:6], transmission[6:]
-        tx_opts, tx_len_raw = tx_header[:2], tx_header[2:]
+        tx_opts = transmission[:2]  # type: bytes
         # Now we parse the length. Luckily the standard library can do that
-        tx_len = struct.unpack("!L", tx_len_raw)[0]  # type: int
+        tx_len = struct.unpack("!L", transmission[2:6])[0]  # type: int
+        tx_payload = transmission[6:]  # type: bytes
         tx_compression = tx_opts[1] % 8  # type: int
 
         # Here we will decompress only the first tx_len bytes
@@ -345,7 +356,7 @@ Each step will be both explained, and written in a python-like pseudocode.
         parsed = 0  # type: int
 
         while parsed < to_parse:
-            msg_header = tx_payload[parsed : parsed + 114 + 2 * β]
+            msg_header = tx_payload[parsed : parsed + 114 + 2*β]  # type: bytes
             parsed += 114 + 2 * β
             msg_sig = msg_header[:32]  # type: bytes
             # Now we parse the length. Luckily the standard library can do that
@@ -431,9 +442,9 @@ ANNOUNCE
 This RPC is used to announce your presence to the network. It is relayed like
 ``SHOUT``, and does not require an ``ACK``.
 
-==================================
-CHANGE_KEY <current key> <new key>
-==================================
+=====================================
+CHANGE_KEY [<current key>, <new key>]
+=====================================
 
 This RPC is used as a key change mechanism. Essentially, it allows you to change
 your public key every so often. This can be used to make it more difficult to
@@ -445,7 +456,7 @@ SHOUT <message>
 ===============
 
 This indicates that a message should be forwarded to all peers if you have not
-previously seen it. ``ACK`` s are ill-advised here.
+previously seen it. ``ACK``\ s are ill-advised here.
 
 Assuming the above, and that ``ℓ`` is obeyed, we should be able to make some
 reasonable assumptions.
@@ -491,7 +502,7 @@ Special Case: Limited Networks
 A limited network is where each node has ℓ outward connections. This is
 the limit set in software, so a node will not initiate more than ℓ
 connections on its own. Because connections must have another end, we
-can conclude that the number of inward connections per node is also ℓ.
+can conclude that the average number of inward connections per node is also ℓ.
 Therefore:
 
 ::
@@ -587,8 +598,8 @@ following change in costs:
 1. Worst case lag is *at worst* the same as it was before (ratio ≤ 1)
 2. *Total* bandwidth used is increased by a factor of 2ℓ - 1 + (1 ÷ n)
 
-Therefore, we can conclude that this broadcast design satisfies the requirements
-for an efficient protocol.
+Therefore, we can conclude that this broadcast design satisfies the given
+requirements for an efficient protocol.
 
 ===============
 SPEAK <message>
@@ -616,8 +627,8 @@ Acknowledge these messages in the format ``ACK [WHISPER, <message signature>]``.
 If Directly Connected
 ~~~~~~~~~~~~~~~~~~~~~
 
-Send the message directly. Encrypt if on an insecure transport. Otherwise
-encryption is optional.
+Send the message directly. Encrypt if using an insecure transport method.
+Otherwise encryption is optional.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 If Not Directly Connected
@@ -654,9 +665,9 @@ address, where distance is given by ``XOR(<extended address>, addr) % 2**τ``. I
 you don't know of ``k`` nodes, send back as many as are known. Format like
 ``ACK [FIND_NODE, <node 0 info>, <node 1 info>, ...]``.
 
-=====================================
-FIND_VALUE [<extended address> <key>]
-=====================================
+=======================================
+FIND_VALUE [<truncated address>, <key>]
+=======================================
 
 While the address can be computed directly from the key, both are included to
 save computation time.
@@ -676,9 +687,9 @@ If Value Known
 Respond in the format ``ACK [FIND_VALUE, <key>, <value>, <metadata>]``. Metadata
 is defined in the Object Overview section.
 
-========================================
-STORE [<extended address> <key> <value>]
-========================================
+===========================================
+STORE [<truncated address>, <key>, <value>]
+===========================================
 
 While the address can be computed directly from the key, both are included to
 save computation time. It should ``ACK`` in a similar format to ``FIND_VALUE``.
