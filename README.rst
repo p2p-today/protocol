@@ -77,13 +77,15 @@ arbitrary, they are chosen to take the smallest space possible when serialized.
 * ``NACK``: 1
 * ``PING``: 2
 * ``SET_CONNECTION_OPT``: 3
-* ``SHOUT``: 4
-* ``SPEAK``: 5
-* ``WHISPER``: 6
-* ``FIND_NODE``: 7
-* ``FIND_VALUE``: 8
-* ``STORE``: 9
-* ``RESERVED``: 10-14
+* ``ANNOUNCE``: 4
+* ``CHANGE_KEY``: 5
+* ``SHOUT``: 6
+* ``SPEAK``: 7
+* ``WHISPER``: 8
+* ``FIND_NODE``: 9
+* ``FIND_VALUE``: 10
+* ``STORE``: 11
+* ``RESERVED``: 12-14
 * ``CUSTOM``: 15
 
 ===============================
@@ -421,6 +423,22 @@ Should either respond ``ACK [SET_CONNECTION_OPT, <option>, <setting>]`` or
 supports this setting.
 
 Note that the arguments are contained in a list.
+
+========
+ANNOUNCE
+========
+
+This RPC is used to announce your presence to the network. It is relayed like
+``SHOUT``, and does not require an ``ACK``.
+
+==================================
+CHANGE_KEY <current key> <new key>
+==================================
+
+This RPC is used as a key change mechanism. Essentially, it allows you to change
+your public key every so often. This can be used to make it more difficult to
+impersonate a node. It is relayed like ``SHOUT``, and does not require an
+``ACK`` except from your direct peers.
 
 ===============
 SHOUT <message>
