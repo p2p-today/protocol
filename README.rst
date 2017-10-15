@@ -271,6 +271,11 @@ Each transmission will start with a Transmission Header, and at least one pair
 of Message Header and Payload. Message Headers and Payloads *always* come in
 associated pairs, and they are *always* directly next to each other.
 
+.. figure:: pics/TransmissionDiagram.png
+   :alt: Graphical representation of a transmission
+
+   Graphical representation of a transmission
+
 ===========
 Serializing
 ===========
@@ -509,7 +514,7 @@ Lag Analysis
 ~~~~~~~~~~~~
 
 I managed to find the worst possible network topology for lag that this
-library will generate. It looks like figures 4 and 5.
+library will generate. It looks like figures 5 and 6.
 
 .. figure:: pics/WorstCaseL1.png
    :alt: Delay in hops for a worst-case network with ℓ=1
