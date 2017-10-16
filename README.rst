@@ -63,8 +63,8 @@ space. Explanations will be given when these numbers are non-arbitrary.
 * ``α``: Kademlia's concurrency parameter (number of parallel lookups)
 * ``τ``: Kademlia's address size (number of bits to consider per address/hash)
 * ``β``: The size of an extended address (bit length of public key)
-* ``ℓ``: The limit on a node's self-initiated connections (at most kτ + 2k -
-   ceil(k×log\ :sub:`2`\ (k+1)))
+* ``ℓ``: The limit on a node's self-initiated connections (at most kτ + 2k - 
+  ⌈k×log\ :sub:`2`\ (k+1))⌉
 
 =======
 Opcodes
