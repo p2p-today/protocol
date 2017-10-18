@@ -63,7 +63,7 @@ space. Explanations will be given when these numbers are non-arbitrary.
 * ``α``: Kademlia's concurrency parameter (number of parallel lookups)
 * ``τ``: Kademlia's address size (number of bits to consider per address/hash)
 * ``β``: The size of an extended address (bit length of public key)
-* ``ℓ``: The limit on a node's self-initiated connections (at most kτ + 2k - 
+* ``ℓ``: The limit on a node's self-initiated connections (at most kτ + 2k -
   ⌈k×log\ :sub:`2`\ (k+1))⌉
 
 =======
@@ -172,15 +172,17 @@ option section. It consists of a bitmap describing how the transmission is
 packed. This table is shown below. The other 4 bytes contain a big endian,
 unsigned integer which says how long the rest of the transmission will be.
 
-+-------+-----------------------------------------------------+
-| Bits  | Meaning                                             |
-+=======+=====================================================+
-| 0-12  | Reserved                                            |
-+-------+-----------------------------------------------------+
-| 13-15 | Compression method (as defined in network settings) |
-+-------+-----------------------------------------------------+
-| 16-47 | Length of remaining transmission                    |
-+-------+-----------------------------------------------------+
+.. table:: Transmission Header Bitwise Layout
+
+    +-------+-----------------------------------------------------+
+    | Bits  | Meaning                                             |
+    +=======+=====================================================+
+    | 0-12  | Reserved                                            |
+    +-------+-----------------------------------------------------+
+    | 13-15 | Compression method (as defined in network settings) |
+    +-------+-----------------------------------------------------+
+    | 16-47 | Length of remaining transmission                    |
+    +-------+-----------------------------------------------------+
 
 ~~~~~~~~~~~~~~
 Message Header
@@ -194,23 +196,26 @@ The signature is applied to all parts of the message that come after it. In
 other words, it is based on everything from bit 256 onwards, including the
 payload.
 
-+------------------+--------------------------------------------+
-| Bits             | Meaning                                    |
-+==================+============================================+
-| 0-255            | RSA signature (SHA-256, PSS padding)       |
-+------------------+--------------------------------------------+
-| 256-287          | Length of message payload                  |
-+------------------+--------------------------------------------+
-| 288-291          | Operation (as defined in RPCs)             |
-+------------------+--------------------------------------------+
-| 292-302          | Reserved                                   |
-+------------------+--------------------------------------------+
-| 303              | Indicates whether the message is encrypted |
-+------------------+--------------------------------------------+
-| 304-(607+β)      | From public key (DER format)               |
-+------------------+--------------------------------------------+
-| (608+β)-(911+2β) | To public key (DER format)                 |
-+------------------+--------------------------------------------+
+
+.. table:: Message Header Bitwise Layout
+
+    +------------------+--------------------------------------------+
+    | Bits             | Meaning                                    |
+    +==================+============================================+
+    | 0-255            | RSA signature (SHA-256, PSS padding)       |
+    +------------------+--------------------------------------------+
+    | 256-287          | Length of message payload                  |
+    +------------------+--------------------------------------------+
+    | 288-291          | Operation (as defined in RPCs)             |
+    +------------------+--------------------------------------------+
+    | 292-302          | Reserved                                   |
+    +------------------+--------------------------------------------+
+    | 303              | Indicates whether the message is encrypted |
+    +------------------+--------------------------------------------+
+    | 304-(607+β)      | From public key (DER format)               |
+    +------------------+--------------------------------------------+
+    | (608+β)-(911+2β) | To public key (DER format)                 |
+    +------------------+--------------------------------------------+
 
 --------------------------
 Isn't that a little large?
@@ -378,9 +383,19 @@ determine what to do with each message.
 Object Overview
 ###############
 
+Please note that these are guidelines. Actual implementations can vary. In
+addition, these guidelines will only work effectively if your language has
+either function pointers or first class functions. Other sorts of languages will
+need more clever solutions for extending the protocol parser.
+
 ===============
 Basic Structure
 ===============
+
+.. figure:: pics/NodeOverview.png
+    :alt: Object Diagram for a Network Node
+
+    Object Diagram for a Network Node
 
 ================
 Protocol Parsing
@@ -543,7 +558,7 @@ Lag Analysis
 ~~~~~~~~~~~~
 
 I managed to find the worst possible network topology for lag that this
-library will generate. It looks like figures 5 and 6.
+library will generate. It looks like figures 6 and 7.
 
 .. figure:: pics/WorstCaseL1.png
    :alt: Delay in hops for a worst-case network with ℓ=1
