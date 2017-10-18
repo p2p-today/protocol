@@ -384,9 +384,8 @@ Object Overview
 ###############
 
 Please note that these are guidelines. Actual implementations can vary. In
-addition, these guidelines will only work effectively if your language has
-either function pointers or first class functions. Other sorts of languages will
-need more clever solutions for extending the protocol parser.
+addition, parts of these guidelines will only work effectively if your language
+has either function pointers or first class functions.
 
 ===============
 Basic Structure
@@ -396,6 +395,42 @@ Basic Structure
     :alt: Object Diagram for a Network Node
 
     Object Diagram for a Network Node
+
+~~~~~~~
+RSA Key
+~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Inbound Socket (Abstractor)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~
+Subnet Descriptor
+~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~
+k-Buckets
+~~~~~~~~~
+
+----
+Peer
+----
+
+~~~~~~~~~~~
+Seen SHOUTs
+~~~~~~~~~~~
+
+~~~~~~~~~~~
+Stored Data
+~~~~~~~~~~~
+
+--------
+Metadata
+--------
+
+~~~~~~~~~~~~~~~
+Node Info Cache
+~~~~~~~~~~~~~~~
 
 ================
 Protocol Parsing
