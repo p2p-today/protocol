@@ -150,7 +150,7 @@ disconnect.
 
 Option: 2
 
-Setting: [k, α, τ, β, ℓ, <network description>]
+Setting: [k, α, τ, β, ℓ, <transport method>, <network description>]
 
 ##############
 Message Format
@@ -400,6 +400,13 @@ Basic Structure
 RSA Key
 ~~~~~~~
 
+This object is a set of three related items. The first is your private key. The
+second is your public key. And the last is a cached version of its DER encoding.
+
+In some languages this will be one object. In others it will be two objects. In
+a few it will be three. For the purposes of representing it, we will treat it as
+one object, since you can derive all parts from the private key.
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Inbound Socket (Abstractor)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -407,6 +414,14 @@ Inbound Socket (Abstractor)
 ~~~~~~~~~~~~~~~~~
 Subnet Descriptor
 ~~~~~~~~~~~~~~~~~
+
+A subnet descriptor is designed to check the network constants of your peers. It
+should be sent over in the initial connection stage, and if there's a mismatch,
+the nodes should immediately disconnect from each other.
+
+This can also be used to find peers, if one has a distributed hash table of
+active nodes, keyed by their descriptor. This paper will describe how such a
+table might work towards the end.
 
 ~~~~~~~~~
 k-Buckets
@@ -420,6 +435,15 @@ Peer
 Seen SHOUTs
 ~~~~~~~~~~~
 
+This object should be considered a set of recently seen signatures. When a node
+receives a SHOUT, it should look at this set, and if it contains the appropriate
+signature, ignore the SHOUT.
+
+To prevent overgrowth of the set, it should be trimmed over time. This can be
+done by time of message, capping the size, or some other method. In general a
+method which eliminates the least recently received signature should be
+preferred.
+
 ~~~~~~~~~~~
 Stored Data
 ~~~~~~~~~~~
@@ -431,6 +455,14 @@ Metadata
 ~~~~~~~~~~~~~~~
 Node Info Cache
 ~~~~~~~~~~~~~~~
+
+This should serve as a cache for the data of nodes that a node cannot currently
+connect to, usually because of limiting network constants.
+
+For instance, if a node receives an ANNOUNCE but it already has ℓ outward
+connections, it can instead place the relevant information in this cache. Then,
+when a peer disconnects, it can refer to this cache to keep its k-buckets
+optimally full.
 
 ================
 Protocol Parsing

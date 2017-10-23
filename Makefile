@@ -1,6 +1,7 @@
 size ?= letter
 
 pdf:
+	@echo "Generating a(n) $(size) pdf"
 	@sed 1,7d README.rst > README.tmp.rst
 	@./pandoc -o README.$(size).pdf README.tmp.rst --toc --toc-depth=2 --dpi=600 \
 	--number-sections --pdf-engine=xelatex -V links-as-notes -V lot -V lof \
