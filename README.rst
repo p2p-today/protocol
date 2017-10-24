@@ -304,6 +304,7 @@ Each step will be both explained, and written in a python-like pseudocode.
 
     # Note that while you would ordinarily use classes for this, I will be using
     # tuples for the sake of brevity
+    # Also note that MsgPackable is a union type.
 
     def make_tx(compression, *messages):  # type: (int, *bytes) -> bytes
         """Make a transmission from a collection of messages"""
@@ -324,18 +325,16 @@ Each step will be both explained, and written in a python-like pseudocode.
         msg_payload = msgpack.packb(payload)  # type: bytes
         msg_to = to.encode()  # type: bytes
         msg_from = priv_key.pub_key.encode()  # type: bytes
-        msg_op = op % 16  # type: int
         if encrypted:
             msg_payload = to.encrypt(msg_payload)
-        msg_len = len(msg_payload)  # type: int
         msg_no_sig = b"".join(
             # packs a big-endian 32 bit unsigned int, then an unsigned byte,
             # then a bool
-            struct.pack("!LB?", msg_len, msg_op << 4, encrypted),
+            struct.pack("!LB?", len(msg_payload), (op % 16) << 4, encrypted),
             msg_to,
             msg_from
-        )
-        msg_sig = priv_key.sign(msg_no_sig)
+        )  # type: bytes
+        msg_sig = priv_key.sign(msg_no_sig)  # type: bytes
         return msg_sig + msg_no_sig
 
 =============
@@ -370,6 +369,9 @@ Each step will be both explained, and written in a python-like pseudocode.
             msg_encrypted = msg_header[37] & 1  # type: int
             msg_from = msg_header[38:76+β/8]  # type: bytes
             msg_to = msg_header[76+β/8:114+β/4]  # type: bytes
+            # Note that we don't unpack the payload on parse time, since it
+            # could be encrypted. One could also have it that they payload is
+            # not accessible at all if it's encrypted. Or some other solution.
             msg_payload = tx_payload[parsed : parsed + msg_len]  # type: bytes
             parsed += msg_len
             # In production you would probably use a class, but for brevity's
@@ -410,6 +412,17 @@ one object, since you can derive all parts from the private key.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Inbound Socket (Abstractor)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is listed as an abstractor because it allows for a common socket API,
+regardless of transport type. In the Python implementation, this abstractor
+would consist of:
+
+* A thread or event loop to listen for incoming data, connections
+* A distributor to get this data to the correct peer (in UDP-like transports)
+* A variety of methods for sending data more conveniently
+
+Other implementations may do this differently, but having this general framework
+allows one to focus less on the details of a particular transport method.
 
 ~~~~~~~~~~~~~~~~~
 Subnet Descriptor
