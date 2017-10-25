@@ -2,13 +2,13 @@ size ?= letter
 
 pdf:
 	@echo "Generating a(n) $(size) pdf"
-	@sed 1,7d README.rst > README.tmp.rst
-	@./pandoc -o README.$(size).pdf README.tmp.rst --toc --toc-depth=2 --dpi=600 \
-	--number-sections --pdf-engine=xelatex -V links-as-notes -V lot -V lof \
-	-V mainfont="DejaVu Sans" -V monofont="Liberation Mono" \
+	@sed 1,7d README.rst > .README.rst
+	@./pandoc -o README.$(size).pdf .README.rst --toc --toc-depth=2 --dpi=600 \
+	--number-sections --pdf-engine=xelatex --include-in-header preamble.tex \
+	-V links-as-notes -V mainfont="DejaVu Sans" -V monofont="Liberation Mono" \
 	-V sansfont="DejaVu Sans" -V geometry:margin=15mm -V papersize=$(size) || \
 	echo "download a pandoc nightly"
-	@rm README.tmp.rst
+	@rm .README.rst
 
 letter:
 	@$(MAKE) pdf size=letter

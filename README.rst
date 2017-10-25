@@ -6,8 +6,12 @@
 
 
 ########
-Abstract
+Preamble
 ########
+
+========
+Abstract
+========
 
 This document is meant to describe a peer-to-peer networking protocol that can
 be reasonably implemented in any popular language. Its principle goals are
@@ -33,9 +37,9 @@ be reasonably implemented in any popular language. Its principle goals are
     2. This table should be able to support atomic changes
     3. This table should be able to support diff-based changes
 
-#####
+=====
 Notes
-#####
+=====
 
 While this document will make references to object diagrams, please be aware
 that we are not dictating how you must implement things. If a different
