@@ -440,6 +440,10 @@ This can also be used to find peers, if one has a distributed hash table of
 active nodes, keyed by their descriptor. This paper will describe how such a
 table might work towards the end.
 
+A way to make the above process more secure may be to add a list of acceptable
+public keys to the subnet descriptor. This would allow nodes to nodes to have
+private, peer-to-peer subnets, while still maintaining visibility in a DHT.
+
 ~~~~~~~~~
 k-Buckets
 ~~~~~~~~~
